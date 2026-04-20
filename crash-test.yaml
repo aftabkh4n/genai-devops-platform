@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crash-test
+  namespace: default
+  labels:
+    app: crash-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crash-test
+  template:
+    metadata:
+      labels:
+        app: crash-test
+    spec:
+      containers:
+      - name: crash-test
+        image: busybox
+        command: ["sh", "-c", "echo 'Starting app...'; echo 'ERROR: Database connection failed'; echo 'FATAL: Cannot connect to postgres://db:5432'; exit 1"]
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
