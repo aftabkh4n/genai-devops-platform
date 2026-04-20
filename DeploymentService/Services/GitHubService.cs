@@ -24,15 +24,9 @@ public class GitHubService
 
     public async Task<string?> OpenHealingPrAsync(HealingResult result)
     {
-        if (string.IsNullOrEmpty(result.CodeFix))
-        {
-            _logger.LogInformation("No code fix suggested for {Pod}, skipping PR", result.PodName);
-            return null;
-        }
-
         try
         {
-            var branchName = $"fix/self-healing-{result.PodName}-{DateTime.UtcNow:yyyyMMddHHmmss}";
+            var branchName = $"fix/self-healing-{result.OriginalFailure.Type}-{DateTime.UtcNow:yyyyMMddHHmmss}";
 
             var mainRef = await _client.Git.Reference.Get(
                 _settings.GitHubRepoOwner,
@@ -46,13 +40,30 @@ public class GitHubService
 
             _logger.LogInformation("Created branch {Branch}", branchName);
 
+            var fixContent = BuildFixFile(result);
+            var fileName = $"fixes/healing-{result.OriginalFailure.Type}-{DateTime.UtcNow:yyyyMMddHHmmss}.md";
+
+            await _client.Repository.Content.CreateFile(
+                _settings.GitHubRepoOwner,
+                _settings.GitHubRepoName,
+                fileName,
+                new CreateFileRequest(
+                    message: $"fix: self-healing patch for {result.OriginalFailure.Type} in {result.PodName}",
+                    content: Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(fixContent)),
+                    branch: branchName)
+                {
+                    Committer = new Committer("self-healing-k8s", "self-healing@github.com", DateTimeOffset.UtcNow)
+                });
+
+            _logger.LogInformation("Committed fix file to branch {Branch}", branchName);
+
             var prBody = BuildPrBody(result);
 
             var pr = await _client.PullRequest.Create(
                 _settings.GitHubRepoOwner,
                 _settings.GitHubRepoName,
                 new NewPullRequest(
-                    title: $"fix: self-healing patch for {result.PodName}",
+                    title: $"fix: self-healing patch for {result.OriginalFailure.Type} in {result.PodName}",
                     head: branchName,
                     baseRef: "main")
                 {
@@ -67,6 +78,27 @@ public class GitHubService
             _logger.LogError(ex, "Failed to open PR for {Pod}", result.PodName);
             return null;
         }
+    }
+
+    private string BuildFixFile(HealingResult result)
+    {
+        return $"""
+            # Self-Healing Analysis Report
+
+            **Pod:** {result.PodName}
+            **Failure Type:** {result.OriginalFailure.Type}
+            **Detected:** {result.OriginalFailure.DetectedAt:yyyy-MM-dd HH:mm:ss} UTC
+            **Severity:** {result.Severity}
+
+            ## Root Cause
+            {result.RootCause}
+
+            ## Suggested Fix
+            {result.SuggestedFix}
+
+            ## Code Fix
+            {result.CodeFix}
+            """;
     }
 
     private string BuildPrBody(HealingResult result)

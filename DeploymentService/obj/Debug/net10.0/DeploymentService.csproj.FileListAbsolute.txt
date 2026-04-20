@@ -30,6 +30,7 @@ C:\Users\Administrator\Downloads\genai-devops-platform\DeploymentService\obj\Deb
 C:\Users\Administrator\Downloads\genai-devops-platform\DeploymentService\obj\Debug\net10.0\DeploymentService.AssemblyInfo.cs
 C:\Users\Administrator\Downloads\genai-devops-platform\DeploymentService\obj\Debug\net10.0\DeploymentService.csproj.CoreCompileInputs.cache
 C:\Users\Administrator\Downloads\genai-devops-platform\DeploymentService\obj\Debug\net10.0\DeploymentService.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Administrator\Downloads\genai-devops-platform\DeploymentService\obj\Debug\net10.0\DeploymentService.sourcelink.json
 C:\Users\Administrator\Downloads\genai-devops-platform\DeploymentService\obj\Debug\net10.0\rjimswa.dswa.cache.json
 C:\Users\Administrator\Downloads\genai-devops-platform\DeploymentService\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 C:\Users\Administrator\Downloads\genai-devops-platform\DeploymentService\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
