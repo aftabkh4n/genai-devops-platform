@@ -20,6 +20,6 @@ spec:
         image: busybox
         command: ["sh", "-c", "echo 'Starting app...'; echo 'ERROR: Database connection failed'; echo 'FATAL: Cannot connect to postgres://db:5432'; exit 1"]
         resources:
-          limits:
-            memory: "64Mi"
-            cpu: "100m"
+        limits:
+        memory: "64Mi"
+        cpu: "100m"
